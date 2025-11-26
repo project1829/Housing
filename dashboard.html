@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرئيسية - سكني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #fafbfc; font-family: 'Tajawal', Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; margin: 0; }
+        .navbar { background: #384AA6; padding: 0.5rem 0; box-shadow: 0 2px 6px #ececec; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { color: #fff; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .nav-menu { list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0; }
+        .nav-menu li a { color: #fff; font-size: 1.09rem; text-decoration: none; padding: 0.5rem 1rem; border-radius: 24px; transition: background 0.2s; }
+        .nav-menu li a.active, .nav-menu li a:hover { background: #212E6B; }
+        .nav-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        .main-content { flex: 1; padding: 1.5rem 0 2rem 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .search-section { background: #fff; padding: 2rem 1rem 1rem 1rem; border-radius: 18px; margin-bottom: 1.5rem; box-shadow: 0 1px 8px #ececec; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .search-box { display: flex; align-items: center; background: #f5f5f5; border-radius: 18px; padding: 8px 16px; gap: 8px; flex: 1; }
+        .search-box input { border: none; outline: none; font-size: 1.05rem; background: transparent; flex: 1; direction: rtl; }
+        .search-box button { background: #384AA6; color: #fff; border: none; padding: 0.5rem 1.4rem; border-radius: 12px; cursor: pointer; font-weight: 500; }
+        .filter-toggle { background: #212E6B; color: #fff; border: none; border-radius: 12px; padding: 0.6rem 1.25rem; font-size: 1rem; cursor: pointer; }
+        .filters-panel { background: #fff; border-radius: 16px; padding: 1rem 1rem; margin-bottom: 1.5rem; display: none; box-shadow: 0 1px 8px #ececec; }
+        .filters-panel.active { display: block; }
+        .filters-grid { display: flex; gap: 1rem; margin-bottom: 0.7rem; flex-wrap: wrap; }
+        .filter-group label { display: block; margin-bottom: 0.3rem; font-weight: 500; color: #384AA6; }
+        .filter-group select, .filter-group input { width: 130px; padding: 0.4rem; border: 1px solid #ececec; border-radius: 8px; margin-bottom: 0.3rem; }
+        .filter-features { display: flex; gap: 1rem; margin-bottom: 0.7rem; flex-wrap: wrap; }
+        .filter-features label { font-size: 1rem; }
+        .filter-actions { text-align: left; }
+        .btn-apply { background: #384AA6; color: #fff; border: none; padding: 0.4rem 1.2rem; border-radius: 8px; margin-left: 0.5rem; cursor: pointer; }
+        .btn-reset { background: #ddd; color: #333; border: none; padding: 0.4rem 1.2rem; border-radius: 8px; cursor: pointer; }
+        .results-header { font-size: 1.05rem; margin-bottom: 1.1rem; font-weight: 500; color: #384AA6; }
+        .housings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.3rem; min-height: 240px; }
+        .housing-card { background:#fff; border-radius:16px; box-shadow:0 2px 10px #ececec; padding:0.9rem; display:flex; flex-direction:column; gap:0.7rem; transition: transform 0.2s; cursor: pointer; }
+        .housing-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px #ddd; }
+        .loading { text-align: center; margin: 2rem 0; display: none; }
+        .no-results { text-align: center; color: #aaa; font-size: 1.2rem; display: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 58, 95, 0.18); z-index: 1200; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; min-width: 320px; border-radius: 18px; padding: 1.1rem 1rem 1rem 1rem; box-shadow: 0 4px 16px #bbb7; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .modal-header h3 { margin: 0; color: #384AA6; font-size: 1.25rem; }
+        .modal-close { background: none; border: none; font-size: 1.3rem; color: #384AA6; cursor: pointer; }
+        .share-link { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
+        .share-link input { flex: 1; border: 1px solid #ececec; border-radius: 7px; padding: 0.5rem; font-size: 1rem; }
+        .share-link button { background: #384AA6; color: #fff; border: none; border-radius: 7px; padding: 0.5rem 0.9rem; cursor: pointer; }
+        .share-options { display: flex; gap: 1rem; justify-content: flex-start; }
+        .share-btn { font-size: 1.28rem; border: none; border-radius: 50%; padding: 0.48rem 0.68rem; color: #fff; text-decoration: none; }
+        .whatsapp { background: #25d366; }
+        .telegram { background: #0088cc; }
+        .email { background: #efc334; color: #444; }
+        @media (max-width: 768px) {
+            .nav-menu { flex-direction: column; position: absolute; top: 58px; right: 0; background: #384AA6; width: 190px; z-index: 100; display: none; }
+            .nav-menu.active { display: flex; }
+            .nav-toggle { display: block; }
+            .main-content { padding: 0.7rem 0 0 0; }
+            .container { padding: 0 0.4rem; }
+            .search-section { flex-direction: column; text-align: center; }
+        }
+        .footer { background: #212E6B; color: #fff; text-align: center; padding: 0.9rem 0 1.2rem 0; font-size: 1rem; letter-spacing: 1px; }
+        .footer i { color: #ea5073; position: relative; top: 1.5px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-home"></i>
+                <span>سكني</span>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-building"></i> السكن</a></li>
+                <li><a href="my-bookings.html"><i class="fas fa-calendar-check"></i> حجوزاتي</a></li>
+                <li><a href="roommate-finder.html"><i class="fas fa-users"></i> زميلات</a></li>
+                <li><a href="add-housing.html"><i class="fas fa-plus"></i> إضافة سكن</a></li>
+                <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="heroSearch" placeholder="ابحثي عن سكن...">
+                    <button id="heroSearchBtn">بحث</button>
+                </div>
+                <button class="filter-toggle" id="filterToggle"><i class="fas fa-filter"></i> فلترة</button>
+            </div>
+
+            <div class="filters-panel" id="filtersPanel">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>المدينة</label>
+                        <select id="filterCity">
+                            <option value="">الكل</option>
+                            <option value="مكة المكرمة">مكة المكرمة</option>
+                            <option value="جدة">جدة</option>
+                            <option value="الرياض">الرياض</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>السعر من</label>
+                        <input type="number" id="filterMinPrice" placeholder="0">
+                    </div>
+                    <div class="filter-group">
+                        <label>السعر إلى</label>
+                        <input type="number" id="filterMaxPrice" placeholder="5000">
+                    </div>
+                    <div class="filter-group">
+                        <label>نوع الغرفة</label>
+                        <select id="filterRoomType">
+                            <option value="">الكل</option>
+                            <option value="single">مفردة</option>
+                            <option value="shared">مشتركة</option>
+                            <option value="apartment">شقة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-features">
+                    <label><input type="checkbox" id="filterWifi"> واي فاي</label>
+                    <label><input type="checkbox" id="filterAc"> تكييف</label>
+                    <label><input type="checkbox" id="filterKitchen"> مطبخ</label>
+                    <label><input type="checkbox" id="filterSecurity"> أمن</label>
+                </div>
+                <div class="filter-actions">
+                    <button id="applyFilters" class="btn-apply">تطبيق</button>
+                    <button id="resetFilters" class="btn-reset">إعادة تعيين</button>
+                </div>
+            </div>
+
+            <div class="results-header">
+                <span id="resultsCount">0 نتيجة</span>
+            </div>
+
+            <div class="housings-grid" id="housingsGrid"></div>
+            
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            
+            <div class="no-results" id="noResults">
+                <i class="fas fa-search"></i>
+                <p>لا توجد نتائج</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> مشاركة</h3>
+                <button class="modal-close" id="closeShareModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-link">
+                    <input type="text" id="shareLink" readonly>
+                    <button id="copyLink"><i class="fas fa-copy"></i></button>
+                </div>
+                <div class="share-options">
+                    <a href="#" class="share-btn whatsapp" id="shareWhatsapp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="share-btn telegram" id="shareTelegram"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="share-btn email" id="shareEmail"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span>جميع الحقوق محفوظة &copy; 2025 <i class="fas fa-heart"></i> سكني</span>
+    </footer>
+
+    <script>
+        document.getElementById('filterToggle').addEventListener('click', function() {
+            document.getElementById('filtersPanel').classList.toggle('active');
+        });
+
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        const dummyData = [
+            {
+                id: 1,
+                title: "شقة راقية في جدة",
+                city: "جدة",
+                price: 3200,
+                roomType: "شقة",
+                wifi: true,
+                ac: true,
+                kitchen: true,
+                security: false,
+                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=400&q=80"
+            },
+            {
+                id: 2,
+                title: "غرفة مفردة بالرياض",
+                city: "الرياض",
+                price: 1500,
+                roomType: "مفردة",
+                wifi: true,
+                ac: true,
+                kitchen: false,
+                security: true,
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"
+            },
+            {
+                id: 3,
+                title: "غرفة مشتركة بمكة المكرمة",
+                city: "مكة المكرمة",
+                price: 800,
+                roomType: "مشتركة",
+                wifi: true,
+                ac: false,
+                kitchen: true,
+                security: true,
+                image: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&q=80"
+            },
+            {
+                id: 4,
+                title: "شقة عائلية فاخرة - الرياض",
+                city: "الرياض",
+                price: 4500,
+                roomType: "شقة",
+                wifi: true,
+                ac: true,
+                kitchen: true,
+                security: true,
+                image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=400&q=80"
+            },
+            {
+                id: 5,
+                title: "غرفة مفردة مطلة على البحر",
+                city: "جدة",
+                price: 2100,
+                roomType: "مفردة",
+                wifi: true,
+                ac: true,
+                kitchen: true,
+                security: false,
+                image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80"
+            },
+            {
+                id: 6,
+                title: "غرفة مشتركة اقتصادية",
+                city: "مكة المكرمة",
+                price: 650,
+                roomType: "مشتركة",
+                wifi: false,
+                ac: true,
+                kitchen: false,
+                security: true,
+                image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&q=80"
+            }
+        ];
+
+        function goToDetails(housingId) {
+            localStorage.setItem('selectedHousingId', housingId);
+            window.location.href = 'housing-details.html';
+        }
+
+        function renderHousings(data) {
+            const grid = document.getElementById('housingsGrid');
+            const loading = document.getElementById('loading');
+            const noResults = document.getElementById('noResults');
+            
+            loading.style.display = 'none';
+            grid.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResults.style.display = 'block';
+                document.getElementById('resultsCount').textContent = '0 نتيجة';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'housing-card';
+                div.onclick = () => goToDetails(item.id);
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;">
+                    <div style="font-weight:bold;font-size:1.09rem;color:#333">${item.title}</div>
+                    <div style="color:#666"><i class="fas fa-map-marker-alt"></i> ${item.city}</div>
+                    <div style="color:#666"><i class="fas fa-door-closed"></i> ${item.roomType}</div>
+                    <div style="color:#384AA6;font-weight:600;font-size:1.1rem"><i class="fas fa-money-bill-wave"></i> ${item.price} ريال/شهر</div>
+                    <div style="font-size:0.92rem;display:flex;gap:0.6rem;flex-wrap:wrap;color:#555">
+                        ${item.wifi ? '<span><i class="fas fa-wifi" style="color:#384AA6"></i> واي فاي</span>' : ''}
+                        ${item.ac ? '<span><i class="fas fa-snowflake" style="color:#384AA6"></i> تكييف</span>' : ''}
+                        ${item.kitchen ? '<span><i class="fas fa-utensils" style="color:#384AA6"></i> مطبخ</span>' : ''}
+                        ${item.security ? '<span><i class="fas fa-shield-alt" style="color:#384AA6"></i> أمن</span>' : ''}
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            
+            document.getElementById('resultsCount').textContent = `${data.length} نتيجة`;
+        }
+
+        localStorage.setItem('housingData', JSON.stringify(dummyData));
+        renderHousings(dummyData);
+    </script>
+</body>
+</html>

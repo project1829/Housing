@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - سكني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #384AA6 0%, #5a6fd8 100%); font-family: 'Tajawal', Arial, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .auth-page { width: 100%; padding: 2rem 1rem; }
+        .auth-container { max-width: 450px; margin: 0 auto; }
+        .auth-card { background: #fff; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); }
+        .auth-header { text-align: center; margin-bottom: 2rem; position: relative; }
+        .back-link { position: absolute; right: 0; top: 0; color: #384AA6; font-size: 1.3rem; text-decoration: none; }
+        .auth-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #384AA6, #5a6fd8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+        .auth-icon i { color: #fff; font-size: 2rem; }
+        .auth-header h1 { color: #384AA6; font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .auth-form { display: flex; flex-direction: column; gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { color: #384AA6; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .form-group input { padding: 0.9rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: all 0.3s; }
+        .form-group input:focus { outline: none; border-color: #384AA6; }
+        .password-input { position: relative; }
+        .password-input input { width: 100%; padding-left: 3rem; }
+        .toggle-password { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; cursor: pointer; font-size: 1.1rem; }
+        .error-message { color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem; display: none; }
+        .btn-submit { background: linear-gradient(135deg, #384AA6, #5a6fd8); color: #fff; border: none; padding: 1rem; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.7rem; transition: all 0.3s; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 74, 166, 0.4); }
+        .form-footer { text-align: center; margin-top: 1rem; }
+        .form-footer p { color: #666; }
+        .form-footer a { color: #384AA6; text-decoration: none; font-weight: 600; }
+        .form-footer a:hover { text-decoration: underline; }
+        @media (max-width: 500px) {
+            .auth-card { padding: 2rem 1.5rem; }
+            .auth-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="auth-page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <a href="index.html" class="back-link">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <div class="auth-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <h1>تسجيل الدخول</h1>
+                </div>
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                        <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        <span class="error-message" id="emailError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
+                        <div class="password-input">
+                            <input type="password" id="password" name="password" required placeholder="••••••••">
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="passwordError"></span>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>دخول</span>
+                    </button>
+                    <div class="form-footer">
+                        <p>ليس لديكِ حساب؟ <a href="register.html">سجلي الآن</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>

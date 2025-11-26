@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البحث عن زميلة - سكني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #fafbfc; font-family: 'Tajawal', Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: #384AA6; padding: 0.5rem 0; box-shadow: 0 2px 6px #ececec; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { color: #fff; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .nav-menu { list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0; }
+        .nav-menu li a { color: #fff; font-size: 1.09rem; text-decoration: none; padding: 0.5rem 1rem; border-radius: 24px; transition: background 0.2s; }
+        .nav-menu li a.active, .nav-menu li a:hover { background: #212E6B; }
+        .nav-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        .main-content { flex: 1; padding: 2rem 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .page-title { margin-bottom: 2rem; }
+        .page-title h1 { color: #384AA6; font-size: 1.8rem; display: flex; align-items: center; gap: 0.7rem; }
+        .preferences-card { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 10px #ececec; margin-bottom: 2rem; }
+        .preferences-card h3 { color: #384AA6; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+        .prefs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; color: #333; font-weight: 500; }
+        .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; font-family: inherit; }
+        .btn-save { background: #384AA6; color: #fff; border: none; padding: 0.7rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
+        .btn-save:hover { background: #212E6B; }
+        .roommates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.3rem; }
+        .roommate-card { background: #fff; border-radius: 16px; padding: 1.3rem; box-shadow: 0 2px 10px #ececec; transition: transform 0.2s; }
+        .roommate-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px #ddd; }
+        .roommate-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .roommate-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #384AA6, #5a6fd8); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.5rem; font-weight: bold; }
+        .roommate-info { flex: 1; }
+        .roommate-name { font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 0.3rem; }
+        .roommate-city { color: #666; font-size: 0.95rem; }
+        .match-score { background: #d4edda; color: #155724; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .roommate-details { margin-bottom: 1rem; }
+        .detail-item { display: flex; align-items: center; gap: 0.5rem; color: #666; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .detail-item i { color: #384AA6; width: 18px; }
+        .roommate-prefs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .pref-tag { background: #f0f0f0; padding: 0.3rem 0.7rem; border-radius: 12px; font-size: 0.85rem; color: #555; }
+        .roommate-actions { display: flex; gap: 0.7rem; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; flex: 1; }
+        .btn-primary { background: #384AA6; color: #fff; }
+        .btn-primary:hover { background: #212E6B; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .loading { text-align: center; padding: 3rem; color: #666; font-size: 1.5rem; }
+        .no-results { text-align: center; padding: 3rem; color: #999; }
+        .no-results i { font-size: 4rem; margin-bottom: 1rem; color: #ccc; }
+        .no-results p { font-size: 1.3rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 58, 95, 0.18); z-index: 1200; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; min-width: 400px; max-width: 500px; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 16px #bbb7; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+        .modal-header h3 { margin: 0; color: #384AA6; font-size: 1.3rem; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; color: #384AA6; cursor: pointer; }
+        .message-to { margin-bottom: 1rem; color: #666; font-size: 1rem; }
+        .message-to span { font-weight: bold; color: #384AA6; }
+        .btn-submit { width: 100%; background: #384AA6; color: #fff; padding: 0.8rem; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; }
+        .btn-submit:hover { background: #212E6B; }
+        .footer { background: #212E6B; color: #fff; text-align: center; padding: 0.9rem 0 1.2rem 0; font-size: 1rem; letter-spacing: 1px; margin-top: 2rem; }
+        .footer i { color: #ea5073; position: relative; top: 1.5px; }
+        @media (max-width: 768px) {
+            .nav-menu { flex-direction: column; position: absolute; top: 58px; right: 0; background: #384AA6; width: 190px; z-index: 100; display: none; }
+            .nav-menu.active { display: flex; }
+            .nav-toggle { display: block; }
+            .prefs-grid { grid-template-columns: 1fr; }
+            .modal-content { min-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-home"></i>
+                <span>سكني</span>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="dashboard.html"><i class="fas fa-building"></i> السكن</a></li>
+                <li><a href="my-bookings.html"><i class="fas fa-calendar-check"></i> حجوزاتي</a></li>
+                <li><a href="roommate-finder.html" class="active"><i class="fas fa-users"></i> زميلات</a></li>
+                <li><a href="add-housing.html"><i class="fas fa-plus"></i> إضافة سكن</a></li>
+                <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-title">
+                <h1><i class="fas fa-users"></i> زميلات متوافقات</h1>
+            </div>
+
+            <div class="preferences-card" id="preferencesCard">
+                <h3><i class="fas fa-sliders-h"></i> تفضيلاتي</h3>
+                <form id="preferencesForm">
+                    <div class="prefs-grid">
+                        <div class="form-group">
+                            <label>وقت النوم</label>
+                            <select id="sleepTime">
+                                <option value="early">مبكر (قبل 10 مساءً)</option>
+                                <option value="moderate" selected>معتدل (10-12 مساءً)</option>
+                                <option value="late">متأخر (بعد 12 مساءً)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>النظافة</label>
+                            <select id="cleanliness">
+                                <option value="very_clean">عالية جداً</option>
+                                <option value="moderate" selected>معتدلة</option>
+                                <option value="relaxed">مرنة</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>الدراسة</label>
+                            <select id="studyHabit">
+                                <option value="quiet">هادئة</option>
+                                <option value="moderate" selected>معتدلة</option>
+                                <option value="social">اجتماعية</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>مستوى الضوضاء</label>
+                            <select id="noiseLevel">
+                                <option value="quiet">هادئ</option>
+                                <option value="moderate" selected>معتدل</option>
+                                <option value="loud">صاخب</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fas fa-search"></i> حفظ والبحث</button>
+                </form>
+            </div>
+
+            <div class="roommates-grid" id="roommatesGrid"></div>
+            
+            <div class="loading" id="roommatesLoading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            
+            <div class="no-results" id="noRoommates" style="display: none;">
+                <i class="fas fa-users-slash"></i>
+                <p>لا توجد زميلات متوافقات حالياً</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope"></i> إرسال رسالة</h3>
+                <button class="modal-close" id="closeMessageModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    <p class="message-to">إلى: <span id="messageTo"></span></p>
+                    <div class="form-group">
+                        <textarea id="messageText" rows="5" required placeholder="اكتبي رسالتك هنا..."></textarea>
+                    </div>
+                    <input type="hidden" id="messageReceiverId">
+                    <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> إرسال</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span>جميع الحقوق محفوظة &copy; 2025 <i class="fas fa-heart"></i> سكني</span>
+    </footer>
+
+    <script>
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        const roommatesData = [
+            {
+                id: 1,
+                name: "سارة أحمد",
+                city: "جدة",
+                age: 22,
+                university: "جامعة الملك عبدالعزيز",
+                major: "علوم حاسب",
+                sleepTime: "moderate",
+                cleanliness: "very_clean",
+                studyHabit: "quiet",
+                noiseLevel: "quiet",
+                matchScore: 95,
+                bio: "طالبة جامعية أبحث عن زميلة ملتزمة وهادئة"
+            },
+            {
+                id: 2,
+                name: "نورة محمد",
+                city: "الرياض",
+                age: 24,
+                university: "جامعة الملك سعود",
+                major: "إدارة أعمال",
+                sleepTime: "moderate",
+                cleanliness: "moderate",
+                studyHabit: "moderate",
+                noiseLevel: "moderate",
+                matchScore: 92,
+                bio: "موظفة أبحث عن شريكة سكن مناسبة"
+            },
+            {
+                id: 3,
+                name: "مريم عبدالله",
+                city: "مكة المكرمة",
+                age: 21,
+                university: "جامعة أم القرى",
+                major: "طب",
+                sleepTime: "late",
+                cleanliness: "very_clean",
+                studyHabit: "quiet",
+                noiseLevel: "quiet",
+                matchScore: 88,
+                bio: "طالبة طب أحتاج بيئة هادئة للدراسة"
+            },
+            {
+                id: 4,
+                name: "فاطمة خالد",
+                city: "جدة",
+                age: 23,
+                university: "جامعة الملك عبدالعزيز",
+                major: "هندسة",
+                sleepTime: "early",
+                cleanliness: "moderate",
+                studyHabit: "social",
+                noiseLevel: "moderate",
+                matchScore: 85,
+                bio: "طالبة هندسة اجتماعية ونشيطة"
+            },
+            {
+                id: 5,
+                name: "هند سعيد",
+                city: "الرياض",
+                age: 25,
+                university: "جامعة الأميرة نورة",
+                major: "تصميم",
+                sleepTime: "moderate",
+                cleanliness: "moderate",
+                studyHabit: "moderate",
+                noiseLevel: "moderate",
+                matchScore: 90,
+                bio: "مصممة جرافيك أبحث عن زميلة متفاهمة"
+            },
+            {
+                id: 6,
+                name: "ريم عمر",
+                city: "جدة",
+                age: 22,
+                university: "جامعة دار الحكمة",
+                major: "صيدلة",
+                sleepTime: "moderate",
+                cleanliness: "very_clean",
+                studyHabit: "quiet",
+                noiseLevel: "quiet",
+                matchScore: 93,
+                bio: "طالبة صيدلة منظمة ومرتبة"
+            }
+        ];
+
+        function getPreferenceText(type, value) {
+            const texts = {
+                sleepTime: { early: 'نوم مبكر', moderate: 'نوم معتدل', late: 'نوم متأخر' },
+                cleanliness: { very_clean: 'نظافة عالية', moderate: 'نظافة معتدلة', relaxed: 'نظافة مرنة' },
+                studyHabit: { quiet: 'دراسة هادئة', moderate: 'دراسة معتدلة', social: 'دراسة اجتماعية' },
+                noiseLevel: { quiet: 'بيئة هادئة', moderate: 'بيئة معتدلة', loud: 'بيئة صاخبة' }
+            };
+            return texts[type][value] || value;
+        }
+
+        function getInitials(name) {
+            return name.split(' ')[0].charAt(0);
+        }
+
+        function renderRoommates(roommates) {
+            const grid = document.getElementById('roommatesGrid');
+            const loading = document.getElementById('roommatesLoading');
+            const noResults = document.getElementById('noRoommates');
+
+            loading.style.display = 'none';
+
+            if (roommates.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            grid.innerHTML = roommates.map(roommate => `
+                <div class="roommate-card">
+                    <div class="roommate-header">
+                        <div class="roommate-avatar">${getInitials(roommate.name)}</div>
+                        <div class="roommate-info">
+                            <div class="roommate-name">${roommate.name}</div>
+                            <div class="roommate-city"><i class="fas fa-map-marker-alt"></i> ${roommate.city}</div>
+                        </div>
+                        <div class="match-score">
+                            <i class="fas fa-heart"></i> ${roommate.matchScore}%
+                        </div>
+                    </div>
+                    <div class="roommate-details">
+                        <div class="detail-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>${roommate.university}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-book"></i>
+                            <span>${roommate.major}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-birthday-cake"></i>
+                            <span>${roommate.age} سنة</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-quote-right"></i>
+                            <span>${roommate.bio}</span>
+                        </div>
+                    </div>
+                    <div class="roommate-prefs">
+                        <span class="pref-tag"><i class="fas fa-moon"></i> ${getPreferenceText('sleepTime', roommate.sleepTime)}</span>
+                        <span class="pref-tag"><i class="fas fa-broom"></i> ${getPreferenceText('cleanliness', roommate.cleanliness)}</span>
+                        <span class="pref-tag"><i class="fas fa-volume-down"></i> ${getPreferenceText('noiseLevel', roommate.noiseLevel)}</span>
+                    </div>
+                    <div class="roommate-actions">
+                        <button class="btn btn-primary" onclick="sendMessage(${roommate.id}, '${roommate.name}')">
+                            <i class="fas fa-envelope"></i> مراسلة
+                        </button>
+                        <button class="btn btn-secondary" onclick="viewProfile(${roommate.id})">
+                            <i class="fas fa-user"></i> الملف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function sendMessage(id, name) {
+            document.getElementById('messageTo').textContent = name;
+            document.getElementById('messageReceiverId').value = id;
+            document.getElementById('messageModal').classList.add('active');
+        }
+
+        function viewProfile(id) {
+            const roommate = roommatesData.find(r => r.id === id);
+            if (roommate) {
+                alert(`الملف الشخصي:
+
+الاسم: ${roommate.name}
+المدينة: ${roommate.city}
+الجامعة: ${roommate.university}
+التخصص: ${roommate.major}
+العمر: ${roommate.age} سنة
+
+${roommate.bio}`);
+            }
+        }
+
+        document.getElementById('closeMessageModal').addEventListener('click', function() {
+            document.getElementById('messageModal').classList.remove('active');
+        });
+
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = document.getElementById('messageText').value;
+            const receiverName = document.getElementById('messageTo').textContent;
+            alert(`تم إرسال رسالتك إلى ${receiverName} بنجاح!`);
+            document.getElementById('messageModal').classList.remove('active');
+            document.getElementById('messageText').value = '';
+        });
+
+        document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('roommatesLoading').style.display = 'block';
+            document.getElementById('roommatesGrid').innerHTML = '';
+            
+            setTimeout(() => {
+                const sortedRoommates = [...roommatesData].sort((a, b) => b.matchScore - a.matchScore);
+                renderRoommates(sortedRoommates);
+            }, 800);
+        });
+
+        renderRoommates(roommatesData.sort((a, b) => b.matchScore - a.matchScore));
+    </script>
+</body>
+</html>
